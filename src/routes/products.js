@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addProduct, deleteProduct, getProduct, updateProduct } from "../controllers/productControllers.js";
+import { addProduct, deleteProduct, getProduct, updateProduct, addImageToProduct } from "../controllers/productControllers.js";
 
 import multer from "multer";
 
@@ -21,13 +21,10 @@ const upload = multer({ storage: storage });
 
 const router = Router();
 
-router.post("/add-product", upload.single("thumbnail"), addProduct)
-router.put("/update-product/:pid", upload.fields([
-    { name: "productImgs1", maxCount: 1 }, // Up to 5 images with the field name "productImgs"
-    { name: "productImgs2", maxCount: 1 }, // Up to 5 images with the field name "productImgs"
-    { name: "productImgs3", maxCount: 1 }, // Up to 5 images with the field name "productImgs"
-    { name: "thumbnail", maxCount: 1 } // 1 thumbnail image with the field name "thumbnail"
-]), updateProduct);
+router.post("/add-product", addProduct)
+router.put("/update-product/:pid", updateProduct);
+router.patch("/update-image/:pid", upload.single('imgFile'), addImageToProduct);
+
 router.get("/get-product/:pid", getProduct)
 router.delete("/delete-product/:pid", deleteProduct)
 

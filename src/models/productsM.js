@@ -20,7 +20,7 @@ const productSchema = mongoose.Schema({
     },
     active: {
         type: Boolean,
-        default: true,
+        default: false,
     },
     review: {
         type: Number,
@@ -41,10 +41,7 @@ const productSchema = mongoose.Schema({
         max: 100
     },
 
-    thumbnail: {
-        filename: String,
-        path: String
-    },
+
 
     productImgs: [{
         filename: String,

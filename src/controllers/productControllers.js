@@ -1,14 +1,10 @@
 import ProductModel from "../models/productsM.js"
 
-import Razorpay from "razorpay"
 
 export const addProduct = async (req, res) => {
     try {
-        console.log("Form Data", req.body); // Use req.body instead of req.data
-        console.log("File Data", req.file); // Use req.body instead of req.data
 
-        // Extract data directly from req.body
-        const { name, description, price, category, stock, tag } = req.body;
+        const { name, description, price, category, stock, tag, active } = req.body;
 
         // Validate required fields
         if (!name || !description || !price) {
@@ -20,13 +16,10 @@ export const addProduct = async (req, res) => {
             name,
             description,
             price,
-            thumbnail: {
-                filename: req.file.originalname,
-                path: req.file.path
-            },
             category,
             stock,
-            tag
+            tag,
+            active
 
         });
 
@@ -36,7 +29,7 @@ export const addProduct = async (req, res) => {
             return res.status(403).json({ message: 'Error while saving the Product' });
         }
 
-        res.status(201).json({ message: 'New Product Added Successfully!', product: savedProduct });
+        res.status(201).json({ message: 'New Product Added Successfully!', data: savedProduct });
 
     } catch (error) {
         console.error(error); // Log the error for debugging
@@ -48,42 +41,24 @@ export const addProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const { pid } = req.params;
-        const { name, description, price } = req.body;
+        const { name, description, price, stock, active } = req.body;
 
         // Extract thumbnail update if any
-        let thumbnailUpdate = {};
-        if (req.files && req.files.thumbnail && req.files.thumbnail.length > 0) {
-            const thumbnailFile = req.files.thumbnail[0]; // Assuming only one thumbnail file is allowed
-            thumbnailUpdate = {
-                thumbnail: {
-                    filename: thumbnailFile.originalname,
-                    path: thumbnailFile.path
-                }
-            };
-        }
-
-        // Extract productImgs update if any
-        let productImgsUpdate = [];
-        if (req.files && req.files.productImgs && req.files.productImgs.length > 0) {
-            productImgsUpdate = req.files.productImgs.map(file => ({
-                filename: file.originalname,
-                path: file.path
-            }));
-        }
+        // This depends on how you handle thumbnail updates
 
         // Combine the fields to update
-        const updateFields = { name, description, price };
-        if (Object.keys(thumbnailUpdate).length !== 0) {
-            Object.assign(updateFields, thumbnailUpdate);
-        }
-        if (productImgsUpdate.length > 0) {
-            updateFields.productImgs = productImgsUpdate;
-        }
+
 
         // Perform the update
         const updatedProduct = await ProductModel.findOneAndUpdate(
             { pid: pid },
-            updateFields,
+            {
+                name,
+                description,
+                price,
+                stock,
+                active
+            },
             { new: true }
         );
 
@@ -96,6 +71,36 @@ export const updateProduct = async (req, res) => {
     } catch (error) {
         console.error("Error updating product:", error);
         res.status(500).json({ message: 'Internal Server Error', error: error.message });
+    }
+};
+export const addImageToProduct = async (req, res) => {
+    try {
+        const { pid } = req.params;
+        console.log("The uploaded Image file", req.file)
+        // Find the product by its ID
+        const productExist = await ProductModel.findOne({ pid });
+        if (!productExist) {
+            return res.status(404).json({ message: "Unable to find the product you are trying to update." });
+        }
+
+        // Create a new image object
+        const newImage = {
+            filename: req.file.originalname,
+            path: req.file.path,
+        };
+
+        // Push the new image to the product's images array
+        productExist.productImgs.push(newImage);
+
+        // Save the updated product
+        await productExist.save();
+
+        // Send a success response
+        return res.status(201).json({ message: "Image sent to the backend successfully!", data: productExist });
+    } catch (error) {
+        // Handle errors
+        console.error("Error adding image to product:", error);
+        return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 };
 

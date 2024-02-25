@@ -14,14 +14,14 @@ export const login = async (req, res) => {
 
     const user = await UserModel.findOne({ email: email });
 
-    if (!user) {
-      return res.status(400).json({ message: "No Such Author Exists!" });
+    const passwordCorrect = await bcrypt.compare(password, user.passwordHash);
+
+
+    if (!user || !passwordCorrect) {
+      return res.status(400).json({ message: "User and Password do not match  " });
     }
 
-    const passwordCorrect = await bcrypt.compare(password, user.passwordHash);
-    if (!passwordCorrect) {
-      return res.status(400).json({ message: "The Password is Incorrect!" });
-    }
+
 
     const { password: userPassword, ...others } = user._doc;
 

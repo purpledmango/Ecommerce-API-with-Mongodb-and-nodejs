@@ -26,7 +26,7 @@ connectToDb();
 // Middleware
 app.use(
   cors({
-    origin: "https://admin.theneighbourhoood.com",
+    origin: "http://localhost:5173",
     credentials: true,
   })
 );
