@@ -41,7 +41,7 @@ export const addProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const { pid } = req.params;
-        const { name, description, price, stock, active } = req.body;
+        const { name, description, price, stock, active, category, tag } = req.body;
 
         // Extract thumbnail update if any
         // This depends on how you handle thumbnail updates
@@ -49,7 +49,7 @@ export const updateProduct = async (req, res) => {
         // Combine the fields to update
 
 
-        // Perform the update
+        // Perform the update   
         const updatedProduct = await ProductModel.findOneAndUpdate(
             { pid: pid },
             {
@@ -57,7 +57,9 @@ export const updateProduct = async (req, res) => {
                 description,
                 price,
                 stock,
-                active
+                active,
+                category,
+                tag
             },
             { new: true }
         );

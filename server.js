@@ -13,6 +13,7 @@ import TagRoutes from "./src/routes/tag.js"
 import KPIRoutes from "./src/routes/KPIs.js"
 import InventoryRoutes from "./src/routes/inventory.js"
 import UsersRoutes from "./src/routes/users.js"
+import ClientRoutes from "./src/routes/clientHome.js"
 import authMiddleware from './src/middlewares/authMiddleWare.js';
 
 import { fileURLToPath } from 'url';
@@ -26,7 +27,7 @@ connectToDb();
 // Middleware
 app.use(
   cors({
-    origin: process.env.PROD_HOST,
+    origin: process.env.DEV_HOST,
     credentials: true,
   })
 );
@@ -71,6 +72,7 @@ app.use('/tag', TagRoutes);
 app.use('/kpi', KPIRoutes);
 app.use('/inventory', InventoryRoutes);
 app.use('/users', UsersRoutes);
+app.use('/client', ClientRoutes);
 
 
 const PORT = process.env.PORT || 3000;
